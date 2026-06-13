@@ -1,0 +1,9 @@
+{
+	"description": "Moving House — shared family task list",
+	"plugins": [],
+	"themes": [
+		"tiddlywiki/vanilla",
+		"tiddlywiki/snowwhite"
+	],
+	"build": {}
+}

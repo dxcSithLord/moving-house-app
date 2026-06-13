@@ -1,0 +1,33 @@
+title: Moving House Tasks
+type: text/vnd.tiddlywiki
+created: 20260612000000000
+modified: 20260612000000000
+
+<a href="/" class="mh-home">🏠 MWS home</a>
+
+!! Moving House Tasks
+
+Shared checklist — tick a task and everyone sees it.
+''<$count filter="[tag[task]field:done[yes]]"/>'' of ''<$count filter="[tag[task]]"/>'' tasks done.
+
+<$list filter="[tag[task-section]nsort[order]]" variable="section">
+
+!!! <$text text=<<section>>/> (<$text text={{{ [tag[task]field:section<section>field:done[yes]count[]] }}}/>/<$text text={{{ [tag[task]field:section<section>count[]] }}}/>)
+
+<$list filter="[tag[task]field:section<section>nsort[order]]" variable="taskTitle">
+<$tiddler tiddler=<<taskTitle>>>
+<div class="mh-task">
+<$checkbox field="done" checked="yes" unchecked="no" actions="""
+<$action-setfield $field="done-by" $value={{{ [{!!done}match[yes]then{$:/status/UserName}] }}}/>
+<$action-setfield $field="done-at" $value=<<now [UTC]YYYY-0MM-0DD0hh:0mm>>/>
+""">&#32;<$list filter="[{!!group}!is[blank]]" variable="x">↳ </$list><$text text=<<taskTitle>>/></$checkbox>
+<$list filter="[{!!done}match[yes]]" variable="x"><span class="mh-by"> ✓ <$text text={{!!done-by}}/> <$text text={{!!done-at}}/></span></$list>
+<$set name="notesTitle" value={{{ [<taskTitle>addsuffix[ (notes)]] }}}>
+&#32;<span class="mh-c"><$link to=<<notesTitle>>>💬 notes<$list filter="[<notesTitle>is[tiddler]has[text]]" variable="x"> •</$list></$link></span>
+<$list filter="[<notesTitle>is[tiddler]has[text]]" variable="x"><div class="mh-notes"><$transclude tiddler=<<notesTitle>> mode="block"/></div></$list>
+</$set>
+</div>
+</$tiddler>
+</$list>
+</$list>
+

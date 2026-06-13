@@ -1,0 +1,9 @@
+title: $:/moving-house/style
+tags: $:/tags/Stylesheet
+type: text/vnd.tiddlywiki
+
+.mh-task { margin: .25em 0; }
+.mh-by { color: #6a8a4a; font-size: .82em; margin-left: .5em; }
+.mh-c { font-size: .82em; margin-left: .5em; }
+.mh-notes { margin: .1em 0 .4em 1.6em; padding: .3em .6em; border-left: 3px solid #cdd9c0; background: #f6f8f2; }
+.mh-home { display: inline-block; margin: 0 0 .6em; padding: .4em .8em; background: #eef3ff; border: 1px solid #c7d6f0; border-radius: 6px; text-decoration: none; }

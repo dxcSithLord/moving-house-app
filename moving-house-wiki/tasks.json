@@ -41,7 +41,7 @@
     {
       "name": "Change of Address Checklist",
       "tasks": [
-        "Notify HM Revenue and Customs",
+        { "title": "Notify HM Revenue and Customs", "shared": true },
         "Notify DVLA",
         "Update electoral roll registration",
         "Notify TV Licensing",
@@ -50,7 +50,7 @@
         "Notify children's schools",
         "Notify friends, family, colleagues",
         "Notify insurance providers, including life insurance",
-        "Notify GP and dentist"
+        { "title": "Notify GP and dentist", "shared": true }
       ]
     },
     {

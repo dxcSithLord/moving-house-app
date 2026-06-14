@@ -61,13 +61,15 @@ cat > dev/mws.dev.json <<'JSON'
 [ { "host": "127.0.0.1", "port": 8080, "secure": true } ]
 JSON
 
-# 6. Initialise the store (creates admin / 1234, applies migrations, imports docs)
+# 6. Initialise the store (creates the admin user, applies migrations, imports docs)
+#    init-store prints a UNIQUE RANDOM admin password ONCE — copy it from the console now.
 npm start init-store
 ```
 
-**Immediately rotate the admin password** — do not leave `1234`. The fork ships a CLI for
-this: `npm start reset-password admin <new-password>` (or change it from the HTMX admin
-profile/password page after logging in).
+**Record the printed admin password**, then set your own — don't rely on the auto-generated
+one long-term: `npm start reset-password admin <new-password>` (or change it from the HTMX
+admin profile/password page after logging in). The fork no longer uses a fixed default
+password (UK PSTI alignment — see the fork's `docs/security.md`).
 
 ### Seed the Moving House task list and the household members
 
@@ -197,7 +199,8 @@ On each member's **phone**:
 
 ## Security checklist (workspace bar: OWASP/NIST)
 
-- [ ] Admin password changed from `1234`.
+- [ ] Auto-generated admin password recorded, then changed to your own (no fixed default; UK
+      PSTI-aligned — see the fork's `docs/security.md`).
 - [ ] MWS bound to `127.0.0.1` only (Part A step 5) — not reachable on the LAN.
 - [ ] `tailscale funnel` is **off** (no public exposure); only `tailscale serve`.
 - [ ] MagicDNS + HTTPS certs enabled; members reach the app by the `.ts.net` name.

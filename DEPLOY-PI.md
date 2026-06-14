@@ -8,6 +8,12 @@ reachable **only** from family members' phones over your private Tailscale netwo
 > no web access to fetch live docs). They are stable, but verify exact flags against
 > the current docs at `tailscale.com/kb` before running, especially `tailscale serve`.
 
+> **Server ops are canonical in the fork.** This runbook covers the *app-specific* parts
+> (seeding the moving-house list + household members). For the general MWS server operations
+> — listener config, systemd, Tailscale Serve, `secure=true`, and backups — the maintained
+> reference is the fork's `docs/operations.md` (with `docs/security.md` for the security
+> posture); the steps below mirror it.
+
 ## Architecture
 
 ```mermaid
@@ -47,18 +53,21 @@ npx --yes npm@10 install
 # 4. Build
 npm run build
 
-# 5. Bind to loopback only (production listener config)
+# 5. Bind to loopback only, behind the TLS-terminating Tailscale Serve proxy.
+#    secure=true marks the session cookie Secure even though MWS speaks plain HTTP to
+#    the proxy (see the fork's docs/operations.md and docs/security.md).
 mkdir -p dev
 cat > dev/mws.dev.json <<'JSON'
-[ { "host": "127.0.0.1", "port": 8080 } ]
+[ { "host": "127.0.0.1", "port": 8080, "secure": true } ]
 JSON
 
 # 6. Initialise the store (creates admin / 1234, applies migrations, imports docs)
 npm start init-store
 ```
 
-**Immediately change the admin password** after first login (the HTMX admin has a
-profile/password page), or rotate it via the admin API. Do not leave `1234`.
+**Immediately rotate the admin password** — do not leave `1234`. The fork ships a CLI for
+this: `npm start reset-password admin <new-password>` (or change it from the HTMX admin
+profile/password page after logging in).
 
 ### Seed the Moving House task list and the household members
 
@@ -194,16 +203,15 @@ On each member's **phone**:
 - [ ] MagicDNS + HTTPS certs enabled; members reach the app by the `.ts.net` name.
 - [ ] Each member has their own MWS user in the `household` role (so `done-by` is real
       attribution), with READ+WRITE scoped to `moving-house` only.
-- [ ] `npm audit` clean (kept at 0 as of this writing).
+- [ ] `npm audit --omit=dev` clean (0 in the fork; the pre-push gate enforces this).
 
 ## Known issues / notes
 
-- **Cookie `Secure` flag:** the browser↔Tailscale leg is HTTPS, but Tailscale serve
-  proxies to MWS as HTTP, so MWS may not mark the session cookie `Secure`. The path is
-  still encrypted end-to-end within the tailnet. If you want the `Secure` flag set,
-  configure MWS to trust the proxy's forwarded-proto, or terminate TLS in MWS instead.
-- **Unauthorized writes return 500 instead of 403** (access is still denied) — a known
-  error-mapping defect to fix in the recipe write path.
+- **Cookie `Secure` flag:** resolved — set `secure: true` in `dev/mws.dev.json` (Part A
+  step 5). MWS then marks the session cookie `Secure` even though Tailscale Serve proxies to
+  it over plain HTTP; verified live behind `tailscale serve`. See the fork's `docs/security.md`.
+- **Unauthorized writes now return `403`** (previously surfaced as `500`) — fixed in the
+  fork's error contract (`SendError` status is honoured).
 - **Updates:** `git pull && npx npm@10 install && npm run build && sudo systemctl restart mws`.
 
 ## Verify it works (from a member's phone, Tailscale on)

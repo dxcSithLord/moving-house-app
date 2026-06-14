@@ -5,6 +5,12 @@ task app: each family member sees what the others have ticked off, and can add n
 per task. It runs on a self-hosted [TiddlyWiki MultiWikiServer (MWS)](https://github.com/TiddlyWiki/MultiWikiServer)
 — specifically the fork below — and is reached from phones over a private Tailscale network.
 
+This app is **one example use case** of that fork, which is a general-purpose
+*"multiple users, multiple wikis"* TiddlyWiki server. The fork's admin was rewritten from
+React to HTMX to cut dependencies, lighten the runtime footprint, and shrink the
+supply-chain attack surface — this family task list is the concrete use case that drove
+those changes, but the server is not specialised to it.
+
 ## Requires (the server it deploys onto)
 
 This repo is **content + deployment tooling only**. It deploys against the MWS fork:
@@ -13,8 +19,10 @@ This repo is **content + deployment tooling only**. It deploys against the MWS f
 > (React admin replaced with a zero-build HTMX admin; OPAQUE auth; role-based ACL;
 > `reset-password` CLI; OpenAPI spec; deployed via `tailscale serve`.)
 
-Clone and build that fork first (see its `ARCHITECTURE.md` and `DEPLOY-PI.md`); this
-repo's scripts talk to it. Set `MWS_DIR` to your fork checkout when running scripts here.
+Clone and build that fork first — see its `ARCHITECTURE.md` for the design and
+`docs/operations.md` for the canonical server deployment runbook (systemd, Tailscale Serve,
+`secure=true`, backups); `docs/security.md` covers the auth/CSRF/FIPS posture. This repo's
+scripts talk to it; set `MWS_DIR` to your fork checkout when running scripts here.
 
 ## Contents
 

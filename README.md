@@ -1,8 +1,8 @@
 # Moving House — shared family task list
 
 The HomeOwners Alliance **Moving House Checklist** turned into a shared, multi-user
-task app: each family member sees what the others have ticked off, and can add notes
-per task. It runs on a self-hosted [TiddlyWiki MultiWikiServer (MWS)](https://github.com/TiddlyWiki/MultiWikiServer)
+task app: each family member sees what the others have ticked off, and can add threaded
+comments per task. It runs on a self-hosted [TiddlyWiki MultiWikiServer (MWS)](https://github.com/TiddlyWiki/MultiWikiServer)
 — specifically the fork below — and is reached from phones over a private Tailscale network.
 
 This app is **one example use case** of that fork, which is a general-purpose
@@ -29,7 +29,7 @@ scripts talk to it; set `MWS_DIR` to your fork checkout when running scripts her
 | Path | What it is |
 |---|---|
 | `moving-house-wiki/` | The seed TiddlyWiki folder (`tiddlywiki.info` + `tiddlers/`). |
-| `moving-house-wiki/build-seed.mjs` | Re-runnable generator — emits the 37 task tiddlers, 5 section tiddlers, the "Moving House Tasks" dashboard (core `$checkbox`/`$list` widgets, per-task `💬 notes` via `{{transclude}}`/`[[link]]`), and a stylesheet. |
+| `moving-house-wiki/build-seed.mjs` | Re-runnable generator — emits the 37 task tiddlers, 5 section tiddlers, the "Moving House Tasks" dashboard (core `$checkbox`/`$list` widgets, per-task `💬` comment threads as discrete append-only `task-comment` tiddlers — one row per comment, no last-write-wins), and a stylesheet. |
 | `seed-household.mjs` | Creates a `household` role + family-member users (one-time temp passwords) and grants READ+WRITE on the `moving-house` bag/recipe. Drives the admin HTTP API. |
 | `DEPLOY-PI.md` | Raspberry Pi 400 + Tailscale deployment runbook. |
 | `Moving-House-Checklist.md` / `.pdf` | The source checklist (origin of the task list). |

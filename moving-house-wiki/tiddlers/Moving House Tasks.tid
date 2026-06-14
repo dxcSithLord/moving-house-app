@@ -23,9 +23,23 @@ Shared checklist — tick a task and everyone sees it.
 """>&#32;<$list filter="[{!!group}!is[blank]]" variable="x">↳ </$list><$text text=<<taskTitle>>/></$checkbox>
 <$list filter="[{!!done}match[yes]]" variable="x"><span class="mh-by"> ✓ <$text text={{!!done-by}}/> <$text text={{!!done-at}}/></span></$list>
 <$set name="notesTitle" value={{{ [<taskTitle>addsuffix[ (notes)]] }}}>
-&#32;<span class="mh-c"><$link to=<<notesTitle>>>💬 notes<$list filter="[<notesTitle>is[tiddler]has[text]]" variable="x"> •</$list></$link></span>
-<$list filter="[<notesTitle>is[tiddler]has[text]]" variable="x"><div class="mh-notes"><$transclude tiddler=<<notesTitle>> mode="block"/></div></$list>
-</$set>
+<$set name="draftTitle" value={{{ [<taskTitle>addprefix[$:/state/moving-house/draft/]] }}}>
+&#32;<details class="mh-details"><summary class="mh-c">💬 <$count filter="[tag[task-comment]field:comment-of<taskTitle>]"/></summary>
+<div class="mh-thread">
+<$list filter="[<notesTitle>is[tiddler]has[text]]" variable="x"><div class="mh-notes"><span class="mh-cby">note (legacy)</span><div class="mh-ctext"><$transclude tiddler=<<notesTitle>> mode="block"/></div></div></$list>
+<$list filter="[tag[task-comment]field:comment-of<taskTitle>nsort[created]]" variable="cmt">
+<div class="mh-comment"><span class="mh-cby"><$text text={{{ [<cmt>get[comment-by]] }}}/></span> <span class="mh-cat"><$text text={{{ [<cmt>get[comment-at]] }}}/></span><div class="mh-ctext"><$transclude tiddler=<<cmt>> mode="block"/></div></div>
+</$list>
+<div class="mh-add"><$edit-text tiddler=<<draftTitle>> field="text" tag="textarea" class="mh-input" placeholder="Add a comment…"/>
+<$button class="mh-addbtn"><$list filter="[<draftTitle>get[text]!is[blank]]" variable="x">
+<$vars nowstamp=<<now [UTC]YYYY0MM0DD0hh0mm0ssXXX>>>
+<$action-createtiddler $basetitle={{{ [<taskTitle>] [{$:/status/UserName}] [<nowstamp>] +[join[ :: ]addprefix[mh-comment :: ]] }}} tags="task-comment" comment-of=<<taskTitle>> comment-by={{$:/status/UserName}} comment-at=<<now [UTC]YYYY-0MM-0DD0hh:0mm>> type="text/vnd.tiddlywiki" text={{{ [<draftTitle>get[text]] }}}/>
+<$action-deletetiddler $tiddler=<<draftTitle>>/>
+</$vars></$list>Add comment</$button>
+</div>
+</div>
+</details>
+</$set></$set>
 </div>
 </$tiddler>
 </$list>

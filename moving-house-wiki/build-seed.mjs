@@ -129,11 +129,28 @@ const view = [
   "<$action-setfield $field=\"done-at\" $value=<<now [UTC]YYYY-0MM-0DD0hh:0mm>>/>",
   "\"\"\">&#32;<$list filter=\"[{!!group}!is[blank]]\" variable=\"x\">↳ </$list><$text text=<<taskTitle>>/></$checkbox>",
   "<$list filter=\"[{!!done}match[yes]]\" variable=\"x\"><span class=\"mh-by\"> ✓ <$text text={{!!done-by}}/> <$text text={{!!done-at}}/></span></$list>",
-  // Comments: link to ([[...]]) and transclude ({{...}}) a per-task notes tiddler.
+  // Comments as DISCRETE, append-only tiddlers — one MWS row per comment, so concurrent
+  // authors never overwrite each other (replaces the old single-notes last-write-wins).
+  // Collapsed behind a <details> with a count; a read-only legacy note is shown above the
+  // thread if an old "<task> (notes)" tiddler still exists.
   "<$set name=\"notesTitle\" value={{{ [<taskTitle>addsuffix[ (notes)]] }}}>",
-  "&#32;<span class=\"mh-c\"><$link to=<<notesTitle>>>💬 notes<$list filter=\"[<notesTitle>is[tiddler]has[text]]\" variable=\"x\"> •</$list></$link></span>",
-  "<$list filter=\"[<notesTitle>is[tiddler]has[text]]\" variable=\"x\"><div class=\"mh-notes\"><$transclude tiddler=<<notesTitle>> mode=\"block\"/></div></$list>",
-  "</$set>",
+  "<$set name=\"draftTitle\" value={{{ [<taskTitle>addprefix[$:/state/moving-house/draft/]] }}}>",
+  "&#32;<details class=\"mh-details\"><summary class=\"mh-c\">💬 <$count filter=\"[tag[task-comment]field:comment-of<taskTitle>]\"/></summary>",
+  "<div class=\"mh-thread\">",
+  "<$list filter=\"[<notesTitle>is[tiddler]has[text]]\" variable=\"x\"><div class=\"mh-notes\"><span class=\"mh-cby\">note (legacy)</span><div class=\"mh-ctext\"><$transclude tiddler=<<notesTitle>> mode=\"block\"/></div></div></$list>",
+  "<$list filter=\"[tag[task-comment]field:comment-of<taskTitle>nsort[created]]\" variable=\"cmt\">",
+  "<div class=\"mh-comment\"><span class=\"mh-cby\"><$text text={{{ [<cmt>get[comment-by]] }}}/></span> <span class=\"mh-cat\"><$text text={{{ [<cmt>get[comment-at]] }}}/></span><div class=\"mh-ctext\"><$transclude tiddler=<<cmt>> mode=\"block\"/></div></div>",
+  "</$list>",
+  "<div class=\"mh-add\"><$edit-text tiddler=<<draftTitle>> field=\"text\" tag=\"textarea\" class=\"mh-input\" placeholder=\"Add a comment…\"/>",
+  "<$button class=\"mh-addbtn\"><$list filter=\"[<draftTitle>get[text]!is[blank]]\" variable=\"x\">",
+  "<$vars nowstamp=<<now [UTC]YYYY0MM0DD0hh0mm0ssXXX>>>",
+  "<$action-createtiddler $basetitle={{{ [<taskTitle>] [{$:/status/UserName}] [<nowstamp>] +[join[ :: ]addprefix[mh-comment :: ]] }}} tags=\"task-comment\" comment-of=<<taskTitle>> comment-by={{$:/status/UserName}} comment-at=<<now [UTC]YYYY-0MM-0DD0hh:0mm>> type=\"text/vnd.tiddlywiki\" text={{{ [<draftTitle>get[text]] }}}/>",
+  "<$action-deletetiddler $tiddler=<<draftTitle>>/>",
+  "</$vars></$list>Add comment</$button>",
+  "</div>",
+  "</div>",
+  "</details>",
+  "</$set></$set>",
   "</div>",
   "</$tiddler>",
   "</$list>",
@@ -151,8 +168,17 @@ writeFileSync(resolve(TID, "Moving House Tasks.tid"), tid({
 const css = [
   ".mh-task { margin: .25em 0; }",
   ".mh-by { color: #6a8a4a; font-size: .82em; margin-left: .5em; }",
-  ".mh-c { font-size: .82em; margin-left: .5em; }",
-  ".mh-notes { margin: .1em 0 .4em 1.6em; padding: .3em .6em; border-left: 3px solid #cdd9c0; background: #f6f8f2; }",
+  ".mh-details { display: inline-block; margin-left: .4em; }",
+  ".mh-c { cursor: pointer; font-size: .82em; color: #6a6a6a; }",
+  ".mh-thread { margin: .2em 0 .4em 1.6em; }",
+  ".mh-comment { margin: .25em 0; padding: .3em .6em; border-left: 3px solid #cdd9c0; background: #f6f8f2; }",
+  ".mh-cby { font-weight: 600; font-size: .82em; color: #4a6a8a; }",
+  ".mh-cat { font-size: .75em; color: #999; margin-left: .4em; }",
+  ".mh-ctext { margin-top: .15em; }",
+  ".mh-add { margin: .35em 0; }",
+  ".mh-input { width: 100%; box-sizing: border-box; min-height: 2.4em; }",
+  ".mh-addbtn { margin-top: .25em; }",
+  ".mh-notes { margin: .25em 0; padding: .3em .6em; border-left: 3px solid #e0d6b0; background: #faf7ea; }",
   ".mh-home { display: inline-block; margin: 0 0 .6em; padding: .4em .8em; background: #eef3ff; border: 1px solid #c7d6f0; border-radius: 6px; text-decoration: none; }",
 ].join("\n");
 writeFileSync(resolve(TID, "$__moving-house_style.tid"), tid({

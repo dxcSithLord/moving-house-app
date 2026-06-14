@@ -10,6 +10,7 @@
 import { createRequire } from "module";
 import { pathToFileURL, fileURLToPath } from "url";
 import { resolve, dirname } from "path";
+import { readFileSync } from "fs";
 
 // Resolve the OPAQUE client from the MWS install (this script lives outside it).
 const HERE = dirname(fileURLToPath(import.meta.url));
@@ -21,7 +22,11 @@ const BASE = process.env.MWS_URL || "http://[::1]:8080";
 const ADMIN_USER = process.env.MWS_ADMIN_USER || "admin";
 const ADMIN_PASS = process.env.MWS_ADMIN_PASS || "1234";
 const ROLE = "household";
-const TARGET = "moving-house"; // bag AND recipe name
+// Read the list config so this works for a cloned/renamed list too.
+let LIST = {};
+try { LIST = (JSON.parse(readFileSync(resolve(HERE, "moving-house-wiki", "tasks.json"), "utf8")).list) || {}; } catch {}
+const TARGET = LIST.recipe || "moving-house"; // bag AND recipe name
+const ROSTER = LIST.membersTiddler || "$:/moving-house/members";
 // Placeholder usernames — edit this list (or set MWS_MEMBERS=alice,bob,carol).
 const MEMBERS = (process.env.MWS_MEMBERS || "member1,member2,member3")
   .split(",").map((s) => s.trim()).filter(Boolean);
@@ -59,6 +64,19 @@ function adminApi(cookie) {
     const text = await res.text();
     if (!res.ok) throw new Error(`admin/${key}: ${res.status} ${text}`);
     return text ? JSON.parse(text) : null;
+  };
+}
+
+// --- write a tiddler into the recipe's writable bag (sync API) ---
+function putTiddler(cookie) {
+  return async (recipe, fields) => {
+    const res = await fetch(`${BASE}/recipe/${recipe}/tiddlers/${encodeURIComponent(fields.title)}`, {
+      method: "PUT",
+      headers: { ...H, "Cookie": cookie, "Referer": `${BASE}/admin-htmx` },
+      body: JSON.stringify(fields),
+    });
+    if (!res.ok) throw new Error(`PUT ${fields.title}: ${res.status} ${await res.text()}`);
+    return res.json().catch(() => null);
   };
 }
 
@@ -102,6 +120,14 @@ async function main() {
   await api("bag_acl_update", { bag_name: TARGET, acl });
   await api("recipe_acl_update", { recipe_name: TARGET, acl });
   console.log(`  + granted '${ROLE}' READ+WRITE on bag and recipe '${TARGET}'`);
+
+  // 4. Write/refresh the members roster so 'shared' (everyone-individually) tasks can show
+  //    N/M complete and gate on everyone having done their part. Read in the dashboard as
+  //    the .list field of ROSTER. Usernames with spaces are wrapped [[like this]].
+  const put = putTiddler(cookie);
+  const listField = MEMBERS.map((m) => (/\s/.test(m) ? `[[${m}]]` : m)).join(" ");
+  await put(TARGET, { title: ROSTER, list: listField, type: "text/vnd.tiddlywiki" });
+  console.log(`  + wrote members roster '${ROSTER}' = ${MEMBERS.join(", ")}`);
 
   console.log("\nOne-time temporary passwords (members should change on first login):");
   for (const c of creds) console.log(`  ${c.username.padEnd(12)} ${c.temporaryPassword}`);

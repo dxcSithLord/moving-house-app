@@ -28,9 +28,13 @@ scripts talk to it; set `MWS_DIR` to your fork checkout when running scripts her
 
 | Path | What it is |
 |---|---|
-| `moving-house-wiki/` | The seed TiddlyWiki folder (`tiddlywiki.info` + `tiddlers/`). |
-| `moving-house-wiki/build-seed.mjs` | Re-runnable generator — emits the 37 task tiddlers, 5 section tiddlers, the "Moving House Tasks" dashboard (core `$checkbox`/`$list` widgets, per-task `💬` comment threads as discrete append-only `task-comment` tiddlers — one row per comment, no last-write-wins), and a stylesheet. |
-| `seed-household.mjs` | Creates a `household` role + family-member users (one-time temp passwords) and grants READ+WRITE on the `moving-house` bag/recipe. Drives the admin HTTP API. |
+| **[`CUSTOMISING.md`](CUSTOMISING.md)** | **How to add/remove tasks, sections, shared (per-person) tasks, and use this repo as a generic template for any shared checklist. Start here to change the list.** |
+| `moving-house-wiki/tasks.json` | The task list as **data** (sections, tasks, `group`, `shared`) — edit this, not code. |
+| `moving-house-wiki/build-seed.mjs` | Re-runnable generator — reads `tasks.json` and emits the task/section tiddlers, the dashboard (core widgets; per-task `💬` comment threads + per-person completion for `shared` tasks), and a stylesheet. |
+| `moving-house-wiki/` | The generated TiddlyWiki seed folder (`tiddlywiki.info` + `tiddlers/`). |
+| `export-tasks.mjs` | Round-trip: rebuild `tasks.json` from a saved wiki snapshot (capture live structural edits back into the repo). |
+| `new-list.mjs` | Scaffold a brand-new checklist instance (`node new-list.mjs "Garden Project" garden`). |
+| `seed-household.mjs` | Creates a `household` role + members, grants READ+WRITE on the bag/recipe, and writes the members roster (for `shared` tasks). Drives the admin HTTP API. |
 | `DEPLOY-PI.md` | Raspberry Pi 400 + Tailscale deployment runbook. |
 | `Moving-House-Checklist.md` / `.pdf` | The source checklist (origin of the task list). |
 

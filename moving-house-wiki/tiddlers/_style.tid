@@ -4,6 +4,12 @@ type: text/vnd.tiddlywiki
 
 .mh-task { margin: .25em 0; }
 .mh-by { color: #6a8a4a; font-size: .82em; margin-left: .5em; }
+.mh-shared-name { font-weight: 600; }
+.mh-everyone { font-size: .7em; font-weight: 400; color: #fff; background: #7a9; border-radius: 3px; padding: 0 .35em; vertical-align: middle; }
+.mh-prog { font-size: .82em; color: #4a6a8a; margin-left: .5em; }
+.mh-allgood { color: #2e7d32; font-weight: 600; font-size: .82em; }
+.mh-who { font-size: .78em; color: #6a8a4a; margin-left: .4em; }
+.mh-mine-btn, .mh-undo { font-size: .8em; margin-left: .5em; }
 .mh-details { display: inline-block; margin-left: .4em; }
 .mh-c { cursor: pointer; font-size: .82em; color: #6a6a6a; }
 .mh-thread { margin: .2em 0 .4em 1.6em; }

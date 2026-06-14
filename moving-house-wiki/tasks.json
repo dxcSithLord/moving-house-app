@@ -1,0 +1,75 @@
+{
+  "list": {
+    "title": "Moving House Tasks",
+    "intro": "Shared checklist — tick a task and everyone sees it.",
+    "bag": "moving-house",
+    "recipe": "moving-house",
+    "description": "Moving House shared family task list",
+    "membersTiddler": "$:/moving-house/members"
+  },
+  "_comment": "A task is a string, or an object {title, group?, shared?}. shared:true = each member completes their OWN copy (per-person), and the task is done only when every member listed in membersTiddler has done it. group nests a task under a preceding heading task in the same section.",
+  "sections": [
+    {
+      "name": "After Your Offer's Been Accepted",
+      "tasks": [
+        "Instruct a conveyancing solicitor",
+        "Book a house survey",
+        "Arrange your mortgage application",
+        "Consider Home Buyer's Insurance",
+        "De-clutter your home",
+        "Get quotes from removal companies"
+      ]
+    },
+    {
+      "name": "Between Exchange and Completion",
+      "tasks": [
+        "Confirm and book your chosen removal company",
+        "Sort Utilities",
+        { "title": "Notify energy suppliers", "group": "Sort Utilities" },
+        { "title": "Notify water supplier", "group": "Sort Utilities" },
+        { "title": "Notify council tax office", "group": "Sort Utilities" },
+        { "title": "Arrange broadband", "group": "Sort Utilities" },
+        "Start packing",
+        "Arrange contents insurance for your new home",
+        "Collect all keys together",
+        "Organise a post redirection",
+        "Cancel milk, subscription boxes, and newspaper deliveries",
+        "If moving to a new area, register with a GP and dentist",
+        "Clean your house"
+      ]
+    },
+    {
+      "name": "Change of Address Checklist",
+      "tasks": [
+        "Notify HM Revenue and Customs",
+        "Notify DVLA",
+        "Update electoral roll registration",
+        "Notify TV Licensing",
+        "Update online shopping delivery addresses",
+        "Notify employers",
+        "Notify children's schools",
+        "Notify friends, family, colleagues",
+        "Notify insurance providers, including life insurance",
+        "Notify GP and dentist"
+      ]
+    },
+    {
+      "name": "On Move Day",
+      "tasks": [
+        "Take meter readings.",
+        "Do a final clean and walk-through of your old home",
+        "Lock up and leave your keys with your estate agent",
+        "Collect your new keys",
+        "Oversee removals company collection/delivery of your things"
+      ]
+    },
+    {
+      "name": "After Moving In",
+      "tasks": [
+        "Check utilities and alarms are working",
+        "Change the locks",
+        "Alert your surveyor to any unexpected faults in your new home"
+      ]
+    }
+  ]
+}

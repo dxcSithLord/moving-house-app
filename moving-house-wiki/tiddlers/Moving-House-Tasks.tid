@@ -8,7 +8,7 @@ modified: 20260612000000000
 !! Moving House Tasks
 
 Shared checklist — tick a task and everyone sees it.
-''<$count filter="[tag[task]field:done[yes]]"/>'' of ''<$count filter="[tag[task]]"/>'' tasks done.
+''<$count filter="[tag[task]field:done[yes]]"/>'' of ''<$count filter="[tag[task]]"/>'' single-owner tasks done.
 
 <$list filter="[tag[task-section]nsort[order]]" variable="section">
 
@@ -17,11 +17,25 @@ Shared checklist — tick a task and everyone sees it.
 <$list filter="[tag[task]field:section<section>nsort[order]]" variable="taskTitle">
 <$tiddler tiddler=<<taskTitle>>>
 <div class="mh-task">
+<$list filter="[{!!shared}!match[yes]]" variable="x">
 <$checkbox field="done" checked="yes" unchecked="no" actions="""
 <$action-setfield $field="done-by" $value={{{ [{!!done}match[yes]then{$:/status/UserName}] }}}/>
-<$action-setfield $field="done-at" $value=<<now [UTC]YYYY-0MM-0DD0hh:0mm>>/>
-""">&#32;<$list filter="[{!!group}!is[blank]]" variable="x">↳ </$list><$text text=<<taskTitle>>/></$checkbox>
+<$action-setfield $field="done-at" $value=<<now [UTC]YYYY-0MM-0DD 0hh:0mm>>/>
+""">&#32;<$list filter="[{!!group}!is[blank]]" variable="g">↳ </$list><$text text=<<taskTitle>>/></$checkbox>
 <$list filter="[{!!done}match[yes]]" variable="x"><span class="mh-by"> ✓ <$text text={{!!done-by}}/> <$text text={{!!done-at}}/></span></$list>
+</$list>
+<$list filter="[{!!shared}match[yes]]" variable="x">
+<$set name="myDoneTitle" value={{{ [<taskTitle>] [{$:/status/UserName}] +[join[ :: ]addprefix[task-done :: ]] }}}>
+<$set name="doneN" value={{{ [tag[task-done]field:done-of<taskTitle>count[]] }}}>
+<$set name="memberN" value={{{ [list[$:/moving-house/members]count[]] }}}>
+<span class="mh-shared-name"><$list filter="[{!!group}!is[blank]]" variable="g">↳ </$list><$text text=<<taskTitle>>/> <span class="mh-everyone">everyone</span></span>
+<span class="mh-prog">✓ <$text text=<<doneN>>/>/<$text text=<<memberN>>/></span>
+<$list filter="[<doneN>compare:integer:gteq<memberN>] :filter[<memberN>compare:integer:gteq[1]]" variable="x"><span class="mh-allgood"> ✅ all done</span></$list>
+<$list filter="[tag[task-done]field:done-of<taskTitle>nsort[done-at]]" variable="d"><span class="mh-who">✓ <$text text={{{ [<d>get[done-by]] }}}/></span></$list>
+<$list filter="[<myDoneTitle>!is[tiddler]]" variable="x"><$button class="mh-mine-btn"><$action-createtiddler $basetitle=<<myDoneTitle>> tags="task-done" done-of=<<taskTitle>> done-by={{$:/status/UserName}} done-at=<<now [UTC]YYYY-0MM-0DD 0hh:0mm>>/>I've done my part</$button></$list>
+<$list filter="[<myDoneTitle>is[tiddler]]" variable="x"><$button class="mh-undo"><$action-deletetiddler $tiddler=<<myDoneTitle>>/>undo mine</$button></$list>
+</$set></$set></$set>
+</$list>
 <$set name="notesTitle" value={{{ [<taskTitle>addsuffix[ (notes)]] }}}>
 <$set name="draftTitle" value={{{ [<taskTitle>addprefix[$:/state/moving-house/draft/]] }}}>
 &#32;<details class="mh-details"><summary class="mh-c">💬 <$count filter="[tag[task-comment]field:comment-of<taskTitle>]"/></summary>
@@ -33,7 +47,7 @@ Shared checklist — tick a task and everyone sees it.
 <div class="mh-add"><$edit-text tiddler=<<draftTitle>> field="text" tag="textarea" class="mh-input" placeholder="Add a comment…"/>
 <$button class="mh-addbtn"><$list filter="[<draftTitle>get[text]!is[blank]]" variable="x">
 <$vars nowstamp=<<now [UTC]YYYY0MM0DD0hh0mm0ssXXX>>>
-<$action-createtiddler $basetitle={{{ [<taskTitle>] [{$:/status/UserName}] [<nowstamp>] +[join[ :: ]addprefix[mh-comment :: ]] }}} tags="task-comment" comment-of=<<taskTitle>> comment-by={{$:/status/UserName}} comment-at=<<now [UTC]YYYY-0MM-0DD0hh:0mm>> type="text/vnd.tiddlywiki" text={{{ [<draftTitle>get[text]] }}}/>
+<$action-createtiddler $basetitle={{{ [<taskTitle>] [{$:/status/UserName}] [<nowstamp>] +[join[ :: ]addprefix[mh-comment :: ]] }}} tags="task-comment" comment-of=<<taskTitle>> comment-by={{$:/status/UserName}} comment-at=<<now [UTC]YYYY-0MM-0DD 0hh:0mm>> type="text/vnd.tiddlywiki" text={{{ [<draftTitle>get[text]] }}}/>
 <$action-deletetiddler $tiddler=<<draftTitle>>/>
 </$vars></$list>Add comment</$button>
 </div>
